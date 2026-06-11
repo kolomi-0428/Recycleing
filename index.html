@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>環保替代品查詢表｜SDG12 責任消費與生產</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Hero 標題區 - 全新設計 -->
+        <div class="hero">
+            <div class="hero-top">
+                <div class="logo-area">
+                    <div class="logo-icon">🌱</div>
+                    <div>
+                        <h1>環保替代品查詢表</h1>
+                        <p class="logo-sub">Eco Alternative Finder</p>
+                    </div>
+                </div>
+                <div class="sdg-badge">
+                    🎯 SDG 12 · 責任消費與生產
+                </div>
+            </div>
+            <p class="hero-description">
+                買東西前查一查 · 真實市售價格參考 · 收錄30項環保替代方案
+            </p>
+        </div>
+
+        <!-- 統計卡片 -->
+        <div class="stats-card">
+            <div class="stats-left">
+                <div class="stat-item">
+                    <span class="stat-number">30+</span>
+                    <span>環保替代品</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">6</span>
+                    <span>大分類</span>
+                </div>
+                <div class="stat-item">
+                    <span>🌍</span>
+                    <span>台灣市售價格</span>
+                </div>
+            </div>
+            <div class="filter-info" id="resultCount">
+                <span class="pulse-dot"></span> 載入中...
+            </div>
+        </div>
+
+        <!-- 搜尋與篩選區 -->
+        <div class="search-wrapper">
+            <div class="search-box">
+                <span class="search-icon">🔍</span>
+                <input type="text" id="searchInput" placeholder="搜尋商品，例如：保鮮膜、牙刷、衛生棉...">
+            </div>
+            <div class="filter-group" id="filterGroup">
+                <button class="filter-btn active" data-cat="all">📋 全部</button>
+                <button class="filter-btn" data-cat="廚房">🍳 廚房</button>
+                <button class="filter-btn" data-cat="浴室">🚿 浴室</button>
+                <button class="filter-btn" data-cat="外出">🎒 外出</button>
+                <button class="filter-btn" data-cat="清潔">🧹 清潔</button>
+                <button class="filter-btn" data-cat="女性用品">🌸 女性用品</button>
+                <button class="filter-btn" data-cat="3C">📱 3C周邊</button>
+            </div>
+        </div>
+
+        <!-- 商品列表區 -->
+        <div id="productList" class="product-grid"></div>
+
+        <!-- 頁尾 -->
+        <footer>
+            <div class="footer-content">
+                <p>🌱 價格參考：MOMO、PChome、博客來、東森購物、樂天市場（2025-2026市售價格）</p>
+                <p>📷 圖片請放入 images/ 資料夾，檔名 1.png ~ 30.png</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 回到頂部按鈕 -->
+    <button id="backToTop" class="back-to-top" title="回到頂部">↑</button>
+
+    <script>
+        // ========== 商品資料庫（真實價格，圖片1~30） ==========
+        const products = [
+            { id: 1, name: "保鮮膜", category: "廚房", alt: "蜂蠟布", price: "NT$320~650/3件組", pros: "天然蜂蠟＋棉麻布，可重複使用1-2年；可堆肥分解", cons: "不耐高溫(65°C以上會融化)；潮濕易發霉", rating: 4.5, tip: "第一次使用前用冷水沖洗，用完以中性洗劑手洗，晾乾即可再用。", imagePath: "images/1.png" },
+            { id: 2, name: "保鮮膜", category: "廚房", alt: "矽膠保鮮蓋", price: "NT$299~499/6件組", pros: "耐溫-20~200°C，可微波冷凍；氣密性佳", cons: "需對應尺寸；容易沾灰塵", rating: 4.6, tip: "購買前先量碗盤直徑，拉伸款彈性大，一個可蓋多種尺寸。", imagePath: "images/2.png" },
+            { id: 3, name: "夾鏈袋", category: "廚房", alt: "矽膠密封袋", price: "NT$350~800/個", pros: "可冷凍微波；不含塑化劑；可重複數百次", cons: "易沾染顏色味道；價格較高", rating: 4.6, tip: "用完翻面清洗，泡小蘇打水可去味，倒扣晾乾。", imagePath: "images/3.png" },
+            { id: 4, name: "免洗餐具", category: "廚房", alt: "不鏽鋼餐盒", price: "NT$250~600/個", pros: "堅固耐摔，保溫佳；食品級304安全", cons: "不能微波；重量較重", rating: 4.8, tip: "選304或316材質，外帶前告知店家，很多店會折5元。", imagePath: "images/4.png" },
+            { id: 5, name: "免洗餐具", category: "廚房", alt: "玻璃保鮮盒", price: "NT$250~800/個", pros: "可微波烤箱；透明可見內容物", cons: "易碎較重", rating: 4.5, tip: "微波時蓋子打開，蓋子通常是PP5或矽膠。", imagePath: "images/5.png" },
+            { id: 6, name: "廚房紙巾", category: "廚房", alt: "可水洗布巾", price: "NT$80~250/條", pros: "可重複數百次；吸水性佳", cons: "需定期清洗", rating: 4.3, tip: "準備3-4條輪流用，每天換一條，掛通風處。", imagePath: "images/6.png" },
+            { id: 7, name: "塑膠砧板", category: "廚房", alt: "木砧板", price: "NT$500~2000", pros: "天然材質，刀痕不易藏菌", cons: "需定期上油；怕潮濕", rating: 4.4, tip: "用完擦乾，每月塗一次食用油可防乾裂。", imagePath: "images/7.png" },
+            { id: 8, name: "一次性牙刷", category: "浴室", alt: "竹製牙刷", price: "NT$120~250/支", pros: "手柄可生物分解", cons: "刷毛為尼龍；需拆金屬夾", rating: 4.0, tip: "用鉗子拔掉刷毛，竹柄可丟一般垃圾自然分解。", imagePath: "images/8.png" },
+            { id: 9, name: "洗髮精", category: "浴室", alt: "洗髮餅", price: "NT$350~600/100g", pros: "無塑包裝；濃縮配方", cons: "起泡較少", rating: 4.2, tip: "先在手上搓出泡沫再抹到頭髮，用完放皂盤瀝乾。", imagePath: "images/9.png" },
+            { id: 10, name: "沐浴乳", category: "浴室", alt: "沐浴皂", price: "NT$150~400/塊", pros: "無塑包裝；成分單純", cons: "皂垢易殘留", rating: 4.3, tip: "用沐浴球或起泡網搓皂，泡沫更多更好沖。", imagePath: "images/10.png" },
+            { id: 11, name: "原生衛生紙", category: "浴室", alt: "再生衛生紙", price: "NT$12~20/包", pros: "減少砍伐；使用回收紙", cons: "紙質較粗", rating: 4.0, tip: "認環保標章或FSC認證，價格跟一般衛生紙差不多。", imagePath: "images/11.png" },
+            { id: 12, name: "原生衛生紙", category: "浴室", alt: "竹漿衛生紙", price: "NT$15~25/包", pros: "竹生長快速；纖維長不易破", cons: "觸感較粗", rating: 4.2, tip: "竹衛生紙較韌不易破，適合擦廚房或桌子。", imagePath: "images/12.png" },
+            { id: 13, name: "棉花棒", category: "浴室", alt: "紙棒棉花棒", price: "NT$40~100/盒", pros: "紙桿可自然分解", cons: "紙桿較軟", rating: 4.3, tip: "確認是紙桿不是塑膠桿，紙桿可丟紙類回收。", imagePath: "images/13.png" },
+            { id: 14, name: "外帶飲料杯", category: "外出", alt: "不鏽鋼保溫杯", price: "NT$400~1200", pros: "保溫保冷佳；堅固耐用", cons: "不耐酸鹼", rating: 4.7, tip: "連鎖飲料店和超商自備杯折5元，一年省150個以上紙杯。", imagePath: "images/14.png" },
+            { id: 15, name: "外帶飲料杯", category: "外出", alt: "陶瓷保溫杯", price: "NT$600~1500", pros: "不影響風味；好清洗", cons: "易碎較重", rating: 4.4, tip: "適合裝咖啡茶類，不會有金屬味，注意防摔。", imagePath: "images/15.png" },
+            { id: 16, name: "外帶飲料杯", category: "外出", alt: "陶瓷塗層保溫杯", price: "NT$799~1500", pros: "內陶瓷塗層不殘留味道", cons: "價格較高", rating: 4.6, tip: "清洗用海綿不要用鋼刷，保護塗層。", imagePath: "images/16.png" },
+            { id: 17, name: "塑膠吸管", category: "外出", alt: "不鏽鋼吸管", price: "NT$150~350/組", pros: "304抗腐蝕；附清潔刷", cons: "喝熱飲會燙", rating: 4.2, tip: "選有附清潔刷的，喝完馬上沖水。", imagePath: "images/17.png" },
+            { id: 18, name: "塑膠吸管", category: "外出", alt: "矽膠吸管", price: "NT$200~500/組", pros: "可折疊好攜帶；不燙口", cons: "容易沾毛屑", rating: 4.3, tip: "選粗管款吸珍珠較順，用完翻面清洗。", imagePath: "images/18.png" },
+            { id: 19, name: "塑膠袋", category: "外出", alt: "棉麻購物袋", price: "NT$100~400", pros: "可重複使用；天然纖維可分解", cons: "潮濕易發霉", rating: 4.6, tip: "折小放包包，髒了直接丟洗衣機。", imagePath: "images/19.png" },
+            { id: 20, name: "飲料提袋", category: "外出", alt: "編織提袋", price: "NT$50~200", pros: "可重複使用；輕巧好收納", cons: "容易弄丟", rating: 4.5, tip: "掛在包包或鑰匙圈上，出門不會忘記。", imagePath: "images/20.png" },
+            { id: 21, name: "塑膠菜瓜布", category: "清潔", alt: "絲瓜絡", price: "NT$150~350/2入", pros: "天然植物纖維；可生物分解", cons: "壽命1-2個月", rating: 4.3, tip: "新絲瓜絡泡溫水會變軟，用完掛通風處。", imagePath: "images/21.png" },
+            { id: 22, name: "塑膠菜瓜布", category: "清潔", alt: "木漿海綿", price: "NT$100~300", pros: "天然木漿；乾燥時不滋生細菌", cons: "不可用力擰", rating: 4.2, tip: "乾的時候硬硬的，沾水變軟，輕輕壓乾就好。", imagePath: "images/22.png" },
+            { id: 23, name: "洗碗精", category: "清潔", alt: "無患子皂角", price: "NT$200~450", pros: "天然皂苷；可生物分解", cons: "需先煮過", rating: 4.1, tip: "用布包幾顆泡熱水搓就有泡沫，煮一鍋放冰箱可保存一週。", imagePath: "images/23.png" },
+            { id: 24, name: "洗碗精", category: "清潔", alt: "無患子手工皂", price: "NT$180~350/100g", pros: "成分單純；具殺菌功效", cons: "需皂盒瀝水", rating: 4.4, tip: "濕菜瓜布在皂上刷幾下就起泡，一塊用一兩個月。", imagePath: "images/24.png" },
+            { id: 25, name: "清潔劑", category: "清潔", alt: "白醋+水", price: "NT$30~60", pros: "天然安全；成本低", cons: "有醋味", rating: 4.3, tip: "白醋和水1:1，噴在玻璃水龍頭等幾分鐘再刷。", imagePath: "images/25.png" },
+            { id: 26, name: "清潔劑", category: "清潔", alt: "小蘇打粉", price: "NT$40~100/包", pros: "天然礦物；除臭去污", cons: "需調成糊狀", rating: 4.5, tip: "加水調成糊狀敷油污處15分鐘，濕布擦掉。", imagePath: "images/26.png" },
+            { id: 27, name: "衛生棉", category: "女性用品", alt: "月亮杯", price: "NT$800~1500", pros: "醫療級矽膠；用5-10年", cons: "需消毒；有學習門檻", rating: 4.8, tip: "首次用煮沸3-5分鐘消毒，一個用五年沒問題。", imagePath: "images/27.png" },
+            { id: 28, name: "衛生棉", category: "女性用品", alt: "布衛生棉", price: "NT$300~800/片", pros: "可重複2-3年；透氣不悶熱", cons: "需清洗", rating: 4.5, tip: "換下用冷水泡，手洗或洗衣袋機洗，曬太陽殺菌。", imagePath: "images/28.png" },
+            { id: 29, name: "衛生棉", category: "女性用品", alt: "月經褲", price: "NT$1000~2000", pros: "穿脫方便；可重複2年", cons: "價格較高", rating: 4.6, tip: "量少單穿一件就夠，量多搭配月亮杯或布棉。", imagePath: "images/29.png" },
+            { id: 30, name: "手機殼", category: "3C", alt: "可分解手機殼", price: "NT$600~1500", pros: "PLA生物可分解", cons: "防摔能力較差", rating: 3.9, tip: "注意有無環保認證，不是所有可分解都能在家堆肥。", imagePath: "images/30.png" }
+        ];
+
+        let currentCategory = "all";
+        let searchKeyword = "";
+        let searchTimeout = null;
+
+        function getStars(rating) {
+            let full = Math.floor(rating);
+            let star = "";
+            for (let i = 0; i < full; i++) star += "★";
+            if (rating - full >= 0.5) star += "½";
+            for (let i = 0; i < 5 - full - (rating - full >= 0.5 ? 1 : 0); i++) star += "☆";
+            return star;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        function renderImage(imgPath, productName) {
+            if (imgPath && imgPath !== "") {
+                return `<img src="${imgPath}" alt="${productName}" loading="lazy">`;
+            }
+            return `<div class="no-img">📷<br>示意圖<br><span style="font-size:11px;">(放入圖片)</span></div>`;
+        }
+
+        function debounceSearch() {
+            if (searchTimeout) clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => render(), 250);
+        }
+
+        function getFilteredProducts() {
+            return products.filter(p => {
+                if (currentCategory !== "all" && p.category !== currentCategory) return false;
+                if (searchKeyword.trim() !== "") {
+                    const kw = searchKeyword.toLowerCase();
+                    const matchName = p.name.toLowerCase().includes(kw);
+                    const matchAlt = p.alt.toLowerCase().includes(kw);
+                    if (!matchName && !matchAlt) return false;
+                }
+                return true;
+            });
+        }
+
+        function render() {
+            const filtered = getFilteredProducts();
+            const container = document.getElementById("productList");
+            const resultSpan = document.getElementById("resultCount");
+
+            if (!container) return;
+
+            if (filtered.length === 0) {
+                resultSpan.innerHTML = `<span class="pulse-dot"></span> 😥 沒有找到相關替代品`;
+                container.innerHTML = `<div class="no-result">✖️ 沒有結果<br><span style="font-size:14px;">試試其他關鍵字或切換分類</span></div>`;
+                return;
+            }
+
+            resultSpan.innerHTML = `<span class="pulse-dot"></span> 🌿 找到 ${filtered.length} 項替代品（共 ${products.length} 項）`;
+
+            let html = "";
+            for (let p of filtered) {
+                html += `
+                    <div class="product-card">
+                        <div class="product-img">
+                            ${renderImage(p.imagePath, p.name)}
+                            <div class="img-overlay">🌿 ${p.category}</div>
+                        </div>
+                        <div class="product-info">
+                            <div class="card-header">
+                                <span class="product-name">🌱 ${escapeHtml(p.name)}</span>
+                                <span class="cat-badge">${escapeHtml(p.category)}</span>
+                            </div>
+                            <div class="alt-name">♻️ 替代品：${escapeHtml(p.alt)}</div>
+                            <div><span class="price-tag">💰 ${escapeHtml(p.price)}</span></div>
+                            <div class="detail-text"><span class="detail-icon">✅</span> ${escapeHtml(p.pros)}</div>
+                            <div class="detail-text"><span class="detail-icon">⚠️</span> ${escapeHtml(p.cons)}</div>
+                            <div class="stars">⭐ ${getStars(p.rating)} (${p.rating})</div>
+                            <div class="tip">💡 ${escapeHtml(p.tip)}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+        }
+
+        function bindEvents() {
+            const searchInput = document.getElementById("searchInput");
+            if (searchInput) {
+                searchInput.addEventListener("input", (e) => {
+                    searchKeyword = e.target.value;
+                    debounceSearch();
+                });
+            }
+
+            const btns = document.querySelectorAll(".filter-btn");
+            btns.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    btns.forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                    currentCategory = btn.getAttribute("data-cat");
+                    render();
+                });
+            });
+
+            const backBtn = document.getElementById("backToTop");
+            if (backBtn) {
+                window.addEventListener("scroll", () => {
+                    if (window.scrollY > 300) {
+                        backBtn.classList.add("show");
+                    } else {
+                        backBtn.classList.remove("show");
+                    }
+                });
+                backBtn.addEventListener("click", () => {
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                });
+            }
+        }
+
+        bindEvents();
+        render();
+    </script>
+</body>
+</html>
